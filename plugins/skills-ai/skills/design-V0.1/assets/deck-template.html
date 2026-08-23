@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stoic Education — Cinematic Deck Engine</title>
+<!--
+  STOIC CINEMATIC DECK ENGINE — design-V0.1
+  Built to be recorded as a movie. Principles, enforced by this file:
+   1. DIRECTIONAL TRANSITIONS  slides PUSH horizontally (next enters from right, prev exits left)
+      on one cinematic easing curve — never fade/scale "from nowhere".
+   2. COHERENT REVEALS         every element enters from ONE direction (rise), staggered one-per-beat,
+      auto-playing on slide-enter. No element appears from a random place.
+   3. NO OVERLAP               all copy lives in grid/flex flow with max-widths + line-heights; the only
+      absolutely-positioned things are the footer + decorative layers. Text cannot collide.
+   4. NO DEAD SPACE            every layout vertically centers a balanced content block (align-content),
+      and metric cells split-anchor — short content never leaves an accidental void.
+   5. RECORD MODE              open with ?play=1 (or press A) to autoplay: reveals cascade, slide holds,
+      then auto-advances. Screen-record that. F = fullscreen. ?slide=N jumps. ←/→/Space/click navigate.
+
+  Build mode clones this file and swaps the <section> contents; keep the engine + tokens.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#15243F; --navy-panel:#1E3257; --parchment:#F6F1E7; --parchment-panel:#ECE4D3;
+  --ink:#19233A; --ink-muted:#5C6577; --cream:#F3EDE1; --cream-muted:#AAB1C2;
+  --wax:#2C49A6; --wax-bright:#3D5FCB;
+  --data-pos:#2F7D5B; --data-neg:#B0492F; --data-neutral:#7C8597; --data-gold:#BE933A;
+  --rule-ink:rgba(25,35,58,.14); --rule-cream:rgba(243,237,225,.16);
+  --font-display:'Fraunces','Iowan Old Style',Georgia,serif;
+  --font-ui:'Inter',system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono','SF Mono',ui-monospace,monospace;
+  /* motion */
+  --ease-cine:cubic-bezier(.76,0,.24,1);   /* easeInOutQuart — buttery slide push   */
+  --ease-out:cubic-bezier(.22,1,.36,1);    /* easeOutQuint  — element settle        */
+  --ease-expo:cubic-bezier(.16,1,.3,1);    /* chart draw-on                          */
+  --t-slide:900ms; --t-rev:640ms; --stagger:110ms; --t-draw:1100ms;
+  --mx:6.5vw; --my:8vh; --foot:58px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font-ui); background:#0b1322; color:var(--ink); -webkit-font-smoothing:antialiased}
+
+/* ---------- stage + directional push transition ---------- */
+#stage{position:fixed; inset:0; overflow:hidden}
+.slide{position:absolute; inset:0; padding:var(--my) var(--mx) calc(var(--my) + var(--foot));
+  display:grid; align-content:center; gap:clamp(16px,2.2vh,28px);
+  transform:translate3d(100%,0,0); will-change:transform; backface-visibility:hidden;
+  transition:transform var(--t-slide) var(--ease-cine)}
+.slide.is-active{transform:translate3d(0,0,0)}
+.slide.is-prev{transform:translate3d(-100%,0,0)}
+.slide.is-next{transform:translate3d(100%,0,0)}
+.slide.navy{background:var(--navy); color:var(--cream)}
+.slide.parchment{background:var(--parchment); color:var(--ink)}
+/* fill layout: content stretches between header and footer so nothing floats in a void */
+.slide.fill{align-content:stretch}
+.slide.fill > *{min-height:0}
+.fill .split,.fill .metrics,.fill .figure{height:100%}
+
+/* ---------- coherent, one-direction staged reveals ---------- */
+[data-reveal]{opacity:0; transform:translateY(24px);
+  transition:opacity var(--t-rev) var(--ease-out), transform var(--t-rev) var(--ease-out)}
+[data-reveal].from-left{transform:translateX(-32px)}
+[data-reveal].shown{opacity:1; transform:none}
+
+/* ---------- type ---------- */
+.kicker{font:600 clamp(12px,1.15vw,16px)/1 var(--font-ui); letter-spacing:.18em; text-transform:uppercase; color:var(--wax)}
+.slide.navy .kicker{color:var(--data-gold)}
+h1{font:600 clamp(40px,6.6vw,108px)/1.0 var(--font-display); letter-spacing:-.02em}
+h2{font:600 clamp(30px,4.6vw,68px)/1.04 var(--font-display); letter-spacing:-.02em}
+h3{font:500 clamp(20px,2.3vw,34px)/1.1 var(--font-display); letter-spacing:-.01em}
+.lead{font:400 clamp(17px,1.7vw,26px)/1.45 var(--font-ui); max-width:34ch; color:var(--ink-muted)}
+.slide.navy .lead{color:var(--cream-muted)}
+.mono{font-family:var(--font-mono); font-variant-numeric:tabular-nums}
+.big-num{font:500 clamp(48px,8vw,120px)/.95 var(--font-mono); font-variant-numeric:tabular-nums; color:var(--wax); letter-spacing:-.01em}
+.slide.navy .big-num{color:var(--data-gold)}
+
+/* ---------- balanced, overflow-safe layout primitives ---------- */
+.wrap{max-width:1180px}
+.stack{display:grid; gap:clamp(14px,2vh,24px); align-content:center; max-width:30ch}
+.split{display:grid; grid-template-columns:1.05fr .95fr; gap:clamp(40px,6vw,110px); align-items:center}
+.points{display:grid; gap:16px; margin-top:6px}
+.point{display:grid; grid-template-columns:auto 1fr; gap:14px; align-items:baseline; max-width:42ch}
+.point .n{font:500 14px var(--font-mono); color:var(--wax)}
+.slide.navy .point .n{color:var(--data-gold)}
+.point p{font:400 clamp(15px,1.3vw,19px)/1.45 var(--font-ui); color:var(--ink-muted)}
+.slide.navy .point p{color:var(--cream-muted)}
+/* metric cells: split-anchored so short content never voids out */
+.metrics{display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(18px,2vw,28px)}
+.cell{background:var(--parchment-panel); border:1px solid var(--rule-ink); border-radius:2px;
+  padding:clamp(26px,2.6vw,40px); height:100%; min-height:clamp(220px,30vh,340px);
+  display:flex; flex-direction:column; justify-content:space-between}
+.slide.navy .cell{background:var(--navy-panel); border-color:var(--rule-cream)}
+.cell .tag{font:600 12px var(--font-ui); letter-spacing:.14em; text-transform:uppercase; color:var(--wax)}
+.slide.navy .cell .tag{color:var(--data-gold)}
+.cell .body{font:400 15px/1.5 var(--font-ui); color:var(--ink-muted); margin-top:12px}
+.slide.navy .cell .body{color:var(--cream-muted)}
+.cell .stat{font:500 clamp(34px,3.4vw,52px)/1 var(--font-mono); color:var(--wax); margin-top:18px}
+.slide.navy .cell .stat{color:var(--data-gold)}
+.cell .cap{font:500 13px var(--font-ui); color:var(--ink-muted); margin-top:6px}
+.slide.navy .cell .cap{color:var(--cream-muted)}
+.seal{width:clamp(96px,10vw,150px); aspect-ratio:1; filter:drop-shadow(0 10px 24px rgba(0,0,0,.4)); justify-self:center}
+
+/* figure: chart + legend side by side, never overlaid */
+.figure{display:grid; grid-template-columns:1fr .8fr; gap:clamp(40px,5vw,90px); align-items:center}
+.donut{width:min(40vh,380px); aspect-ratio:1; justify-self:center; position:relative}
+.fill .donut{width:min(54vh,440px)}
+.donut svg{transform:rotate(-90deg); overflow:visible}
+.seg{fill:none; stroke-width:15; stroke-dashoffset:var(--p);
+  transition:stroke-dashoffset var(--segdur,1100ms) var(--ease-expo) var(--segdelay,0ms); will-change:stroke-dashoffset}
+.slide.is-active .seg{stroke-dashoffset:0}
+.donut .ctr{position:absolute; inset:0; display:grid; place-content:center; text-align:center}
+.donut .ctr b{font:500 clamp(34px,4vw,52px) var(--font-mono); color:var(--cream); display:block}
+.donut .ctr span{font:500 12px var(--font-ui); letter-spacing:.14em; text-transform:uppercase; color:var(--cream-muted)}
+.legend{display:grid; gap:18px; align-content:center}
+.lrow{display:grid; grid-template-columns:auto 1fr auto; gap:14px; align-items:center}
+.sw{width:14px;height:14px;border-radius:3px}
+.lname{font:500 clamp(16px,1.5vw,21px) var(--font-display); color:var(--cream)}
+.lval{font:500 clamp(17px,1.6vw,22px) var(--font-mono); color:var(--cream)}
+
+/* ---------- spine ---------- */
+footer{position:fixed; left:var(--mx); right:var(--mx); bottom:22px; z-index:6;
+  display:flex; justify-content:space-between; align-items:center; pointer-events:none;
+  font:500 12px/1 var(--font-ui); letter-spacing:.1em; text-transform:uppercase; color:var(--ink-muted);
+  border-top:1px solid var(--rule-ink); padding-top:14px}
+body.on-navy footer{color:var(--cream-muted); border-top-color:var(--rule-cream)}
+footer .c{font-family:var(--font-mono); letter-spacing:.05em}
+#bar{position:fixed; left:0; bottom:0; height:2px; width:0; background:var(--wax); z-index:7;
+  transition:width var(--t-slide) var(--ease-cine)}
+.hint{position:fixed; right:var(--mx); top:calc(var(--my) - 10px); z-index:7;
+  font:500 11px var(--font-mono); color:var(--ink-muted); opacity:.45; pointer-events:none}
+body.on-navy .hint{color:var(--cream-muted)}
+body.playing .hint{opacity:0}
+
+@media (prefers-reduced-motion: reduce){
+  .slide{transition:none} [data-reveal]{transition:none; opacity:1; transform:none} .seg{stroke-dashoffset:0}
+}
+@media print{
+  html,body{overflow:visible}
+  footer,#bar,.hint{display:none}
+  .slide{position:relative; transform:none !important; break-after:page; height:100vh}
+  [data-reveal]{opacity:1; transform:none} .seg{stroke-dashoffset:0}
+}
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- 1 · COVER -->
+  <section class="slide navy" data-dwell="4200" style="grid-template-columns:1.5fr .5fr; align-items:center">
+    <div class="stack" style="max-width:none">
+      <div class="kicker" data-reveal>Stoic Education · Module 00 · Lesson 0.3</div>
+      <h1 data-reveal>The true ROI<br>of a U.S. degree</h1>
+      <p class="lead" data-reveal>Hidden costs, real salaries, and a 15-year break-even — run for your own profile.</p>
+    </div>
+    <div data-reveal style="justify-self:center">
+      <svg class="seal" viewBox="0 0 100 100" aria-label="Stoic seal">
+        <circle cx="50" cy="50" r="46" fill="var(--wax)"/>
+        <circle cx="50" cy="50" r="40" fill="none" stroke="var(--cream)" stroke-width="1.2" opacity=".55"/>
+        <path d="M34 64c2-16 8-26 18-28-7 5-9 16-7 28z M52 36c8 2 12 10 12 20" fill="none" stroke="var(--cream)" stroke-width="2" opacity=".9"/>
+        <text x="50" y="86" text-anchor="middle" font-family="var(--font-display)" font-style="italic" font-size="11" fill="var(--cream)">stoic</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- 2 · STATEMENT (intentional, centered space — not a void) -->
+  <section class="slide parchment fill" data-dwell="3800" style="justify-items:start; grid-template-rows:auto 1fr auto">
+    <div class="kicker" data-reveal>The only number that matters</div>
+    <h2 data-reveal class="wrap" style="max-width:20ch; align-self:center">ROI = extra earnings <span style="color:var(--ink-muted)">−</span> what you spent.</h2>
+    <p class="lead" data-reveal style="align-self:end">Over a 15-year career — by the end you can run it for any school, major, and country.</p>
+  </section>
+
+  <!-- 3 · SPLIT (text | metric) -->
+  <section class="slide parchment fill" data-dwell="4600" style="grid-template-rows:1fr">
+    <div class="split" style="align-items:stretch; gap:clamp(30px,4vw,72px)">
+      <div class="stack" style="max-width:none; justify-content:center">
+        <div class="kicker" data-reveal>The four real costs</div>
+        <h2 data-reveal>Families count two.<br>There are four.</h2>
+        <div class="points">
+          <div class="point" data-reveal><span class="n mono">01</span><p>Tuition + room/board — the visible ~60%.</p></div>
+          <div class="point" data-reveal><span class="n mono">02</span><p>Travel, visa, insurance — rarely listed.</p></div>
+          <div class="point" data-reveal><span class="n mono">03</span><p>Opportunity cost — the hidden killer.</p></div>
+        </div>
+      </div>
+      <div data-reveal style="display:grid; align-content:center; justify-items:center; text-align:center; border-left:1px solid var(--rule-ink); padding-left:clamp(36px,4vw,80px)">
+        <div class="big-num">$340K</div>
+        <p class="lead" style="max-width:18ch; margin:10px auto 0; text-align:center">real 4-year total — not the $240K families budget.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 · METRICS (split-anchored cells — no voids) -->
+  <section class="slide parchment fill" data-dwell="5000" style="grid-template-rows:auto 1fr">
+    <div class="kicker" data-reveal style="margin-bottom:6px">Three outcomes · same school</div>
+    <div class="metrics">
+      <div class="cell" data-reveal>
+        <div><span class="tag">Case A · SF</span>
+          <p class="body">Need-blind aid, a high-paying major, an early visa win — it paid for itself fast.</p></div>
+        <div><div class="stat" style="color:var(--data-pos)">&lt;1 yr</div><div class="cap">break-even</div></div>
+      </div>
+      <div class="cell" data-reveal>
+        <div><span class="tag">Case B · Detroit</span>
+          <p class="body">Full sticker, a solid salary, a decade of patience.</p></div>
+        <div><div class="stat">14 yr</div><div class="cap">break-even</div></div>
+      </div>
+      <div class="cell" data-reveal>
+        <div><span class="tag">Case C · UB</span>
+          <p class="body">No salary premium back home.</p></div>
+        <div><div class="stat" style="color:var(--data-neg)">never</div><div class="cap">net-negative</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 · FIGURE (donut draws clockwise; legend beside, never overlaid) -->
+  <section class="slide navy fill" data-dwell="5200" style="grid-template-rows:auto 1fr">
+    <div class="kicker" data-reveal>Figure · Where the four costs go</div>
+    <div class="figure" data-reveal>
+      <div class="donut">
+        <svg viewBox="0 0 120 120">
+          <circle class="seg" cx="60" cy="60" r="52" pathLength="100" stroke="var(--wax)"
+            stroke-dasharray="60 100" style="--p:60; --segdur:660ms; --segdelay:0ms; transform:rotate(0deg); transform-origin:center"></circle>
+          <circle class="seg" cx="60" cy="60" r="52" pathLength="100" stroke="var(--data-neutral)"
+            stroke-dasharray="28 100" style="--p:28; --segdur:308ms; --segdelay:150ms; transform:rotate(216deg); transform-origin:center"></circle>
+          <circle class="seg" cx="60" cy="60" r="52" pathLength="100" stroke="var(--data-gold)"
+            stroke-dasharray="12 100" style="--p:12; --segdur:132ms; --segdelay:300ms; transform:rotate(316.8deg); transform-origin:center"></circle>
+        </svg>
+        <div class="ctr"><b>$340K</b><span>4-yr total</span></div>
+      </div>
+      <div class="legend">
+        <div class="lrow"><span class="sw" style="background:var(--wax)"></span><span class="lname">Tuition + living</span><span class="lval">60%</span></div>
+        <div class="lrow"><span class="sw" style="background:var(--data-neutral)"></span><span class="lname">Opportunity cost</span><span class="lval">28%</span></div>
+        <div class="lrow"><span class="sw" style="background:var(--data-gold)"></span><span class="lname">Travel · visa</span><span class="lval">12%</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · CLOSE -->
+  <section class="slide navy" data-dwell="4600" style="grid-template-columns:1.5fr .5fr; align-items:center">
+    <div class="stack" style="max-width:none">
+      <div class="kicker" data-reveal>Stoic Education · Lesson 0.3</div>
+      <h2 data-reveal>Now you can run the number.<br>Run it before you commit.</h2>
+      <p class="lead" data-reveal>Next — Lesson 1.1: how the U.S. higher-education system actually works.</p>
+      <p class="mono" data-reveal style="font-size:13px; color:var(--cream-muted); margin-top:6px">NACE 2024 · MoLSP Mongolia 2024 · IRS SOI · USCIS H-1B FY2025</p>
+    </div>
+    <div data-reveal style="justify-self:center">
+      <svg class="seal" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="46" fill="var(--wax)"/>
+        <circle cx="50" cy="50" r="40" fill="none" stroke="var(--cream)" stroke-width="1.2" opacity=".55"/>
+        <path d="M34 64c2-16 8-26 18-28-7 5-9 16-7 28z M52 36c8 2 12 10 12 20" fill="none" stroke="var(--cream)" stroke-width="2" opacity=".9"/>
+        <text x="50" y="86" text-anchor="middle" font-family="var(--font-display)" font-style="italic" font-size="11" fill="var(--cream)">stoic</text>
+      </svg>
+    </div>
+  </section>
+
+</div>
+
+<div id="bar"></div>
+<footer><span>Stoic Edu · True ROI of a U.S. Degree</span><span class="c">01 / 06</span></footer>
+<div class="hint">→ next · A play · F full</div>
+
+<script>
+(function(){
+  const slides=[...document.querySelectorAll('.slide')];
+  const total=slides.length, bar=document.getElementById('bar'), count=document.querySelector('footer .c');
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let cur=0, playing=false, timer=null, revs=[];
+
+  function items(s){ return [...s.querySelectorAll('[data-reveal]')]; }
+  function clearRevs(){ revs.forEach(clearTimeout); revs=[]; }
+  function hideAll(s){ items(s).forEach(el=>el.classList.remove('shown')); }
+  function revealIn(s){
+    if(reduce){ items(s).forEach(el=>el.classList.add('shown')); return; }
+    items(s).forEach((el,i)=> revs.push(setTimeout(()=>el.classList.add('shown'), 280 + i*110)));
+  }
+  function dwell(s){
+    if(s.dataset.dwell) return +s.dataset.dwell;
+    return 3400 + items(s).length*460;
+  }
+  function position(){
+    slides.forEach((s,i)=>{
+      s.classList.toggle('is-active', i===cur);
+      s.classList.toggle('is-prev', i<cur);
+      s.classList.toggle('is-next', i>cur);
+    });
+    document.body.classList.toggle('on-navy', slides[cur].classList.contains('navy'));
+    bar.style.width=(cur/(total-1))*100+'%';
+    count.textContent=String(cur+1).padStart(2,'0')+' / '+String(total).padStart(2,'0');
+  }
+  function go(i, instant){
+    i=Math.max(0,Math.min(total-1,i));
+    clearRevs();
+    slides.forEach((s,k)=>{ if(k!==i) hideAll(s); });
+    cur=i;
+    if(instant){ slides.forEach(s=>s.style.transition='none'); position();
+      requestAnimationFrame(()=>{ requestAnimationFrame(()=>slides.forEach(s=>s.style.transition='')); }); }
+    else position();
+    // reveal after the slide has begun arriving (so content animates in on the new frame)
+    const delay = instant ? 60 : 360;
+    revs.push(setTimeout(()=>revealIn(slides[cur]), delay));
+    location.hash='s'+(cur+1);
+    if(playing) schedule();
+  }
+  function schedule(){ clearTimeout(timer);
+    timer=setTimeout(()=>{ if(!playing) return; if(cur<total-1) go(cur+1); else stop(); }, dwell(slides[cur])); }
+  function play(){ if(playing) return; playing=true; document.body.classList.add('playing'); go(cur); }
+  function stop(){ playing=false; document.body.classList.remove('playing'); clearTimeout(timer); }
+
+  addEventListener('keydown',e=>{
+    if(['ArrowRight',' ','PageDown'].includes(e.key)){e.preventDefault(); stop(); go(cur+1);}
+    else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault(); stop(); go(cur-1);}
+    else if(e.key==='Home'){stop(); go(0);} else if(e.key==='End'){stop(); go(total-1);}
+    else if(e.key.toLowerCase()==='a'){ playing?stop():play(); }
+    else if(e.key.toLowerCase()==='f'){ document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen(); }
+    else if(e.key.toLowerCase()==='p'){ print(); }
+  });
+  addEventListener('click',e=>{ stop(); (e.clientX<innerWidth*0.22)?go(cur-1):go(cur+1); });
+
+  // entry points: ?slide=N jumps instantly (for stills); ?play=1 autoplays (record this)
+  const q=new URLSearchParams(location.search);
+  const h=(location.hash.match(/s(\d+)/)||[])[1];
+  const start = q.get('slide') ? (+q.get('slide')-1) : (h ? +h-1 : 0);
+  go(start, true);
+  if(q.get('play')==='1') setTimeout(play, 700);
+})();
+</script>
+</body>
+</html>

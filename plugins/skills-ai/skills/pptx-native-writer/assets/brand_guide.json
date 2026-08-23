@@ -1,0 +1,19 @@
+{
+  "name": "Stoic Education",
+  "_note": "PPTX-side mirror of design-system/stoic-design-system.md. Keep in sync.",
+  "colors": {
+    "navy": "15243F", "navy_panel": "1E3257",
+    "parchment": "F6F1E7", "parchment_panel": "ECE4D3",
+    "ink": "19233A", "ink_muted": "5C6577",
+    "cream": "F3EDE1", "cream_muted": "AAB1C2",
+    "wax": "2C49A6", "wax_bright": "3D5FCB",
+    "data_pos": "2F7D5B", "data_neg": "B0492F",
+    "data_neutral": "7C8597", "data_gold": "BE933A"
+  },
+  "fonts": { "display": "Fraunces", "ui": "Inter", "mono": "JetBrains Mono" },
+  "sizes_pt": {
+    "kicker": 14, "title": 40, "display": 72,
+    "body": 18, "stat": 96, "footer": 10, "source": 11
+  },
+  "footer": "STOIC EDU"
+}

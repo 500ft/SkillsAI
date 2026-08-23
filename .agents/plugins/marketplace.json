@@ -1,0 +1,20 @@
+{
+  "name": "skills-ai",
+  "interface": {
+    "displayName": "500ft SkillsAI"
+  },
+  "plugins": [
+    {
+      "name": "skills-ai",
+      "source": {
+        "source": "local",
+        "path": "./plugins/skills-ai"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Development"
+    }
+  ]
+}

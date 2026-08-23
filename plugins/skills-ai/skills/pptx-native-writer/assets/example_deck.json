@@ -1,0 +1,35 @@
+{
+  "lesson": "True ROI of a U.S. Degree",
+  "slides": [
+    {
+      "type": "title",
+      "kicker": "Stoic Education · Module 00 · Lesson 0.3",
+      "title": "The true ROI of a U.S. degree",
+      "subtitle": "Hidden costs, real salaries, and a 15-year break-even you'll run for your own profile."
+    },
+    {
+      "type": "content",
+      "kicker": "The Four Real Costs · 4-Year Totals",
+      "title": "Families count two of the four real costs.",
+      "bullets": [
+        "Tuition + fees — $160–260K (on the university website)",
+        "Room + board + living — $60–100K (often understated)",
+        "Travel + visa + insurance — $15–25K (almost never listed)",
+        "Opportunity cost — $40–80K (the hidden killer, on no website)"
+      ]
+    },
+    {
+      "type": "stat",
+      "kicker": "Opportunity Cost · The Hidden Killer",
+      "stat": "$40–80K",
+      "caption": "The income you didn't earn in four years — versus friends who started working at 18."
+    },
+    {
+      "type": "close",
+      "kicker": "Stoic Education · Lesson 0.3",
+      "title": "Now you can run the number.",
+      "subtitle": "Next — Module 01 · Lesson 1.1: how the U.S. higher-education system actually works.",
+      "sources": "Sources: NACE 2024 · MoLSP Mongolia 2024 · IRS SOI · Numbeo 2024 · USCIS H-1B FY2025."
+    }
+  ]
+}

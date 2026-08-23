@@ -1,0 +1,20 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "skills-ai",
+  "description": "The portable 500ft skill collection for research, engineering, design, and agent development.",
+  "owner": {
+    "name": "500ft"
+  },
+  "plugins": [
+    {
+      "name": "skills-ai",
+      "description": "A curated collection of 78 reusable AI skills for research, engineering, design, planning, and agent development.",
+      "author": {
+        "name": "500ft"
+      },
+      "category": "development",
+      "source": "./plugins/skills-ai",
+      "homepage": "https://github.com/500ft/SkillsAI"
+    }
+  ]
+}

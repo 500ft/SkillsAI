@@ -1,0 +1,40 @@
+{
+  "name": "skills-ai",
+  "version": "1.0.0",
+  "description": "A curated collection of 78 reusable AI skills for research, engineering, design, planning, and agent development.",
+  "author": {
+    "name": "500ft",
+    "url": "https://github.com/500ft"
+  },
+  "homepage": "https://github.com/500ft/SkillsAI",
+  "repository": "https://github.com/500ft/SkillsAI",
+  "keywords": [
+    "agent-skills",
+    "claude-code",
+    "codex",
+    "chatgpt",
+    "research",
+    "design"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "SkillsAI",
+    "shortDescription": "500ft's portable AI skill collection",
+    "longDescription": "Seventy-eight reusable skills spanning research, engineering, planning, software development, presentations, visual design, and agent tooling.",
+    "developerName": "500ft",
+    "category": "Development",
+    "capabilities": [
+      "Research",
+      "Engineering",
+      "Design",
+      "Development"
+    ],
+    "websiteURL": "https://github.com/500ft/SkillsAI",
+    "defaultPrompt": [
+      "Show me which SkillsAI skill fits this task.",
+      "Use the relevant SkillsAI workflow for this project.",
+      "List the SkillsAI capabilities available here."
+    ],
+    "brandColor": "#14213D"
+  }
+}

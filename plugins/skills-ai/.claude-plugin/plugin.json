@@ -1,0 +1,10 @@
+{
+  "name": "skills-ai",
+  "version": "1.0.0",
+  "description": "A curated collection of 78 reusable AI skills for research, engineering, design, planning, and agent development.",
+  "author": {
+    "name": "500ft"
+  },
+  "homepage": "https://github.com/500ft/SkillsAI",
+  "repository": "https://github.com/500ft/SkillsAI"
+}
