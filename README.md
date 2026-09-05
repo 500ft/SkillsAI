@@ -11,8 +11,15 @@ Portable home for the AI skills used by 500ft. The repository packages the same 
 - Safe local installers for `~/.claude/skills` and `~/.agents/skills`
 - A ChatGPT ZIP exporter for uploading individual skills
 - Validation and CI checks for manifests, inventory, symlinks, local paths, and likely secrets
+- Copy-paste project prompts under `Prompts/`
 
 The inventory is in [docs/skill-catalog.md](docs/skill-catalog.md). Platform-managed skills and downloaded plugin caches are intentionally not mirrored; see [docs/scope.md](docs/scope.md).
+
+## Reusable prompts
+
+[Task Deliverables and Development](Prompts/TaskDeliverablesAndDevelopment.md) turns a project's verified state into a 4–7 day roadmap, starts implementation, and keeps task status and evidence ready for a later review. It includes a main prompt, a session-resume prompt, and a final-review prompt for Claude, Codex, or ChatGPT.
+
+Open the target project, copy the main prompt, and fill in the inputs you know. The default is six days and approximately 30 focused hours, with implementation starting immediately; select `plan only` for a roadmap without implementation. These Markdown prompts are used directly and are separate from plugin installation and ChatGPT skill ZIP exports.
 
 ## Install in Claude Code
 
@@ -69,6 +76,7 @@ SkillsAI/
 │   └── skills/                             # 78 portable skill packages
 ├── config/                                 # audited inventories
 ├── docs/                                   # catalog, scope, and notices
+├── Prompts/                                # reusable project and task prompts
 └── scripts/                                # install, package, and validation tools
 ```
 
