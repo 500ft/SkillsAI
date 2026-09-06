@@ -1,0 +1,10 @@
+diff --git a/.github/workflows/validate.yml b/.github/workflows/validate.yml
+index 669657f..b7a0156 100644
+--- a/.github/workflows/validate.yml
++++ b/.github/workflows/validate.yml
+@@ -20,4 +20,4 @@ jobs:
+       - name: Smoke-test ChatGPT packaging
+         run: |
+           ./scripts/package-chatgpt.sh
+-          test "$(find dist/chatgpt -name '*.zip' | wc -l)" -eq 78
++          test "$(find dist/chatgpt -name '*.zip' | wc -l)" -eq 90
