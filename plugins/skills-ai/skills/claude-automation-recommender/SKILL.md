@@ -94,7 +94,7 @@ Create skills in `.claude/skills/<name>/SKILL.md`. Some are also available via p
 | Building plugins | skill-development | plugin-dev |
 | Git commits | commit | commit-commands |
 | React/Vue/Angular | frontend-design | frontend-design |
-| Automation rules | writing-rules | hookify |
+| Automation rules | hookify-rules | hookify |
 | Feature planning | feature-dev | feature-dev |
 
 **Custom skills to create** (with templates, scripts, examples):
