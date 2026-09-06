@@ -1,0 +1,2 @@
+id,project,task,gate_type,why_it_matters,what_it_adds,done_when,depends_on,executable_now,tier
+XX-01,Project,Commit the acceptance criterion before the measurement,preregister,"Written after the result it cannot fail","Turns the run into a real PASS/FAIL","Criterion committed with hash; no data taken",,yes,0

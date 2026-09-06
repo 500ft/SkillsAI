@@ -2,7 +2,7 @@
 
 SkillsAI is an audited snapshot of user-installed, reusable skill packages—not a copy of every skill visible to one application.
 
-The repository also contains manually used, copy-paste prompts under `Prompts/`. They are separate from the 78-skill inventory and are not installed or exported by the skill packaging scripts.
+The repository also contains manually used, copy-paste prompts under `Prompts/`. They are separate from the 90-skill inventory and are not installed or exported by the skill packaging scripts.
 
 ## Included
 

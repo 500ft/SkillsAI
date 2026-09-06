@@ -1,10 +1,10 @@
 # SkillsAI
 
-Portable home for the AI skills used by 500ft. The repository packages the same 78 skill directories for Claude Code, Codex, and ChatGPT without depending on machine-specific symlinks or plugin caches.
+Portable home for the AI skills used by 500ft. The repository packages the same 90 skill directories for Claude Code, Codex, and ChatGPT without depending on machine-specific symlinks or plugin caches.
 
 ## What is included
 
-- 78 user-installed skills under `plugins/skills-ai/skills/`
+- 90 user-installed skills under `plugins/skills-ai/skills/`
 - Claude Code and Codex plugin manifests
 - Marketplace manifests for direct installation from GitHub
 - The shared Stoic design system required by the presentation and visual-design skills
@@ -73,7 +73,7 @@ SkillsAI/
 │   ├── .claude-plugin/plugin.json          # Claude Code plugin
 │   ├── .codex-plugin/plugin.json           # Codex/OpenAI plugin
 │   ├── design-system/                      # shared Stoic design references
-│   └── skills/                             # 78 portable skill packages
+│   └── skills/                             # 90 portable skill packages
 ├── config/                                 # audited inventories
 ├── docs/                                   # catalog, scope, and notices
 ├── Prompts/                                # reusable project and task prompts
