@@ -40,7 +40,7 @@ Some pre-built skills are available through official plugins (install via `/plug
 
 | Skill | Best For |
 |-------|----------|
-| **writing-rules** | Creating hookify rules for automation |
+| **hookify-rules** | Creating hookify rules for automation |
 
 ### Feature Development (feature-dev)
 
@@ -57,7 +57,7 @@ Some pre-built skills are available through official plugins (install via `/plug
 | Building plugins | skill-development | plugin-dev |
 | Git commits | commit | commit-commands |
 | React/Vue/Angular | frontend-design | frontend-design |
-| Automation rules | writing-rules | hookify |
+| Automation rules | hookify-rules | hookify |
 | Feature planning | feature-dev | feature-dev |
 
 ---
